@@ -1,7 +1,8 @@
-use sea_orm::ColumnTrait;
-use sea_orm::{PaginatorTrait, QueryFilter};
 use entity::{dog, owner};
-use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr, DerivePartialModel, EntityTrait, QuerySelect};
+use sea_orm::{
+    ActiveModelTrait, ActiveValue, ColumnTrait, DatabaseConnection, DbErr, DerivePartialModel,
+    EntityTrait, PaginatorTrait, QueryFilter, QuerySelect,
+};
 use uuid::Uuid;
 
 #[derive(Debug, DerivePartialModel, PartialEq)]
@@ -100,6 +101,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_update_dog_chip() -> Result<(), DbErr> {
+        let dog_id = Uuid::default();
         let conn = MockDatabase::new(DatabaseBackend::Sqlite)
             .append_query_results([
                 [dog::Model {
@@ -112,7 +114,7 @@ mod tests {
                 }],
             ])
             .into_connection();
-        update_dog_chip(Uuid::default(), "chip_2".to_string(), &conn).await?;
+        update_dog_chip(dog_id, "chip_2".to_string(), &conn).await?;
         Ok(())
     }
 
@@ -196,17 +198,19 @@ mod tests {
                 owner_id: Default::default(),
                 chip_id: "chip_1".to_string(),
             }]])
-            // First one-to-many relationship in the `dog` table is procedure, we must get it and then delete it
+            // First one-to-many relationship in the `dog` table is
+            // procedure, we must get it and then delete it
             .append_query_results([[procedure::Model {
                 id,
                 dog_id: Uuid::default(),
-                procedure_description: "test procedure".to_string(),
+                procedure_desc: "test procedure".to_string(),
                 datetime: time.clone(),
             }]])
             .append_exec_results([MockExecResult::default()])
-            // Next relationship in the `dog` table is visits, which in turn has few one-to-many relationships
+            // Next relationship in the `dog` table is visits,
+            // which in turn has few one-to-many relationships
             .append_query_results([
-                // select first the visit model
+                // first, select the visit model
                 [visit::Model {
                     id,
                     dog_id: Uuid::default(),
@@ -214,27 +218,29 @@ mod tests {
                     datetime: time.clone(),
                 }
                 .into_mock_row()],
-                // then first one-to-many relationship in the `visit` table
+                // then, the first 1-to-m relationship in the `visit` table
                 [symptom::Model {
                     id,
                     visit_id: Uuid::new_v4(),
-                    symptom: "Test symptom".to_string(),
+                    desc: "Test symptom".to_string(),
                 }
                 .into_mock_row()],
-                // then next one-to-many relationship in the `visit` table
+                // then, the next 1-to-m relationship in the `visit` table
                 [visit_prescription::Model {
                     id,
                     visit_id: Uuid::new_v4(),
-                    prescription_id: Default::default(),
+                    med_id: Default::default(),
+                    notes: "test note".to_string(),
                     datetime: time.clone(),
                 }
                 .into_mock_row()],
             ])
-            // remove all three tables
+            // remove all three models
             .append_exec_results([MockExecResult::default()])
             .append_exec_results([MockExecResult::default()])
             .append_exec_results([MockExecResult::default()])
-            // The last relationship in the `dog` table is vaccinations, get the model and delete it
+            // The last relationship in the `dog` table
+            // is vaccinations, get the model and delete it
             .append_query_results([[vaccination::Model {
                 id,
                 dog_id: Uuid::default(),

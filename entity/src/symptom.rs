@@ -7,8 +7,8 @@ pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: Uuid,
     pub visit_id: Uuid,
-    #[sea_orm(column_type = "Text")]
-    pub symptom: String,
+    #[sea_orm(column_type = "Text", column_rename = "description")]
+    pub desc: String,
     #[sea_orm(
         belongs_to,
         from = "visit_id",

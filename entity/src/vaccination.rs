@@ -7,6 +7,7 @@ pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: Uuid,
     pub dog_id: Uuid,
+    // Should be another table, but leaving String for simplicity
     pub vaccine_sku: String,
     pub date: TimeDate,
     #[sea_orm(

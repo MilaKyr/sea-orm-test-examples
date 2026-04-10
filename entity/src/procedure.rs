@@ -8,7 +8,8 @@ pub struct Model {
     pub id: Uuid,
     pub dog_id: Uuid,
     // Should be another table, but used String here for simplicity
-    pub procedure_description: String,
+    #[sea_orm(column_type = "Text", column_rename = "procedure_description")]
+    pub procedure_desc: String,
     pub datetime: TimeDateTime,
     #[sea_orm(
         belongs_to,

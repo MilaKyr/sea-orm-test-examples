@@ -7,7 +7,9 @@ pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: Uuid,
     pub visit_id: Uuid,
-    pub prescription_id: Uuid,
+    pub med_id: Uuid,
+    #[sea_orm(column_type = "Text")]
+    pub notes: String,
     pub datetime: TimeDateTime,
     #[sea_orm(
         belongs_to,
@@ -19,12 +21,12 @@ pub struct Model {
     pub visit: HasOne<crate::visit::Entity>,
     #[sea_orm(
         belongs_to,
-        from = "prescription_id",
+        from = "med_id",
         to = "id",
         on_update = "NoAction",
         on_delete = "Cascade"
     )]
-    pub prescription: HasOne<crate::prescription::Entity>,
+    pub medication: HasOne<crate::medication::Entity>,
 }
 
 impl ActiveModelBehavior for ActiveModel {}

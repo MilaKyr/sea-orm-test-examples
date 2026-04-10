@@ -1,0 +1,21 @@
+[package]
+name = "seaorm_tests"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "seaorm_tests"
+path = "src/lib.rs"
+
+[workspace]
+members = [".", "entity"]
+
+[dependencies]
+entity = { path = "entity" }
+tokio = { version = "1.51.1", features = ["rt", "rt-multi-thread", "macros"] }
+time = "0.3.47"
+uuid = { version = "1.23.0", features = ["v4"] }
+
+[dependencies.sea-orm]
+version = "2.0.0-rc.18"
+features = ["sqlx-sqlite", "runtime-tokio-native-tls", "macros", "with-uuid", "mock", "schema-sync", "entity-registry"]
